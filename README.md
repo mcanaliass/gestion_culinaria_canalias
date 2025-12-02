@@ -169,15 +169,18 @@ Tienes dos opciones:
 gestion_culinaria_canalias/
 ├── backend/
 │   ├── controllers/
+│   │   ├── admin_controller.js
 │   │   ├── auth_controller.js
 │   │   ├── recipe_controller.js
 │   │   └── user_controller.js
 │   ├── middleware/
+│   │   ├── admin_middleware.js
 │   │   └── auth_middleware.js
 │   ├── models/
 │   │   └── recipe.js
 │   │   ├── user.js
 │   ├── routes/
+│   │   ├── admin_routes.js
 │   │   ├── auth_routes.js
 │   │   ├── recipe_routes.js
 │   │   └── user_routes.js
@@ -189,20 +192,26 @@ gestion_culinaria_canalias/
 │   └── css/
 │       └── main.css
 │   ├── html/
+│   │   ├── admin.html
 │   │   ├── crear_receta.html
+│   │   ├── editar_receta.html
 │   │   ├── explorar.html
 │   │   ├── index.html
 │   │   ├── login.html
+│   │   ├── perfil_publico.html
 │   │   ├── perfil.html
 │   │   ├── registro.html
 │   │   └── ver_receta.html
 │   ├── js/
+│   │   ├── admin.js
 │   │   ├── auth.js
 │   │   ├── config.js
 │   │   ├── crear_receta.js
+│   │   ├── editar_receta.js
 │   │   ├── explorar.js
 │   │   ├── index.js
 │   │   ├── login.js
+│   │   ├── perfil_publico.js
 │   │   ├── perfil.js
 │   │   ├── registro.js
 │   │   └── ver_receta.js
@@ -341,12 +350,6 @@ Asegúrate de que `const API_URL` solo esté declarado en `config.js` y que todo
 <script src="../js/config.js"></script>
 <script src="../js/auth.js"></script>
 ```
-
-### Botones de agregar ingredientes/pasos no funcionan
-Verifica que no haya errores de sintaxis en la consola del navegador (F12). Asegúrate de que `config.js` se cargue antes que los demás scripts.
-
-### Las estrellas de calificación no responden
-Verifica que `configurarAcciones()` se llame dentro de `mostrarReceta()` después de que el contenido se haya cargado.
 
 ## Contribuidores
 
