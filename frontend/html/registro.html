@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro - Cocinalias</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">Cocinalias</a>
+    </div>
+  </nav>
+
+  <main class="container my-5">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-body">
+            <h2 class="card-title text-center mb-4">Crear Cuenta</h2>
+            
+            <div id="mensaje-container"></div>
+
+            <form id="form-registro">
+              <div class="mb-3">
+                <label for="nombre" class="form-label">Nombre completo</label>
+                <input type="text" class="form-control" id="nombre" required maxlength="100">
+              </div>
+
+              <div class="mb-3">
+                <label for="email" class="form-label">Correo electrónico</label>
+                <input type="email" class="form-control" id="email" required>
+              </div>
+
+              <div class="mb-3">
+                <label for="password" class="form-label">Contraseña</label>
+                <input type="password" class="form-control" id="password" required minlength="8">
+                <small class="form-text text-muted">
+                  Mínimo 8 caracteres, debe incluir mayúscula, minúscula y número
+                </small>
+              </div>
+
+              <div class="mb-3">
+                <label for="confirmar-password" class="form-label">Confirmar contraseña</label>
+                <input type="password" class="form-control" id="confirmar-password" required>
+              </div>
+
+              <div class="mb-3">
+                <label for="rol" class="form-label">¿Cómo te gustaría registrarte?</label>
+                <select class="form-select" id="rol" required>
+                  <option value="usuario">Usuario regular</option>
+                  <option value="chef">Chef/Experto culinario</option>
+                </select>
+              </div>
+
+              <button type="submit" class="btn btn-primary w-100" id="btn-registrar">
+                Registrarse
+              </button>
+            </form>
+
+            <p class="text-center mt-3">
+              ¿Ya tienes cuenta? <a href="login.html">Inicia sesión aquí</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../js/config.js"></script>
+  <script src="../js/registro.js"></script>
+</body>
+</html>
