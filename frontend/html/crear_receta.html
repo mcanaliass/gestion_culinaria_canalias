@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crear Receta - Cocinalias</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+      <a class="navbar-brand" href="index.html"> Cocinalias</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="explorar.html">Explorar Recetas</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="perfil.html">Mi Perfil</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="crear_receta.html">Crear Receta</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" id="btn-logout">Cerrar Sesión</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container my-5">
+    <h1 class="mb-4">Crear Nueva Receta</h1>
+
+    <div id="mensaje-container"></div>
+
+    <form id="form-crear-receta">
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Información Básica</h5>
+          <div class="row">
+            <div class="col-md-12 mb-3">
+              <label for="titulo" class="form-label">Título de la receta</label>
+              <input type="text" class="form-control" id="titulo" required maxlength="100">
+            </div>
+            <div class="col-md-12 mb-3">
+              <label for="descripcion" class="form-label">Descripción</label>
+              <textarea class="form-control" id="descripcion" rows="3" required maxlength="500"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Ingredientes</h5>
+          <div id="ingredientes-container">
+            <div class="row ingrediente-item mb-2">
+              <div class="col-md-4">
+                <input type="text" class="form-control ingrediente-nombre" placeholder="Nombre del ingrediente" required>
+              </div>
+              <div class="col-md-2">
+                <input type="number" class="form-control ingrediente-cantidad" placeholder="Cantidad" min="0" step="0.01" required>
+              </div>
+              <div class="col-md-3">
+                <select class="form-select ingrediente-unidad" required>
+                  <option value="">Unidad</option>
+                  <option value="gramos">Gramos</option>
+                  <option value="kilogramos">Kilogramos</option>
+                  <option value="litros">Litros</option>
+                  <option value="mililitros">Mililitros</option>
+                  <option value="tazas">Tazas</option>
+                  <option value="cucharadas">Cucharadas</option>
+                  <option value="cucharaditas">Cucharaditas</option>
+                  <option value="unidades">Unidades</option>
+                  <option value="pizca">Pizca</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <input type="number" class="form-control ingrediente-costo" placeholder="Costo" min="0" step="0.01" required>
+              </div>
+              <div class="col-md-1">
+                <button type="button" class="btn btn-danger btn-sm remove-ingrediente" disabled>X</button>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="btn btn-secondary btn-sm" id="agregar-ingrediente">+ Agregar Ingrediente</button>
+        </div>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Pasos de Preparación</h5>
+          <div id="pasos-container">
+            <div class="paso-item mb-3">
+              <label class="form-label">Paso 1</label>
+              <textarea class="form-control paso-descripcion" rows="2" required maxlength="500"></textarea>
+            </div>
+          </div>
+          <button type="button" class="btn btn-secondary btn-sm" id="agregar-paso">+ Agregar Paso</button>
+        </div>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Detalles</h5>
+          <div class="row">
+            <div class="col-md-3 mb-3">
+              <label for="tiempo-preparacion" class="form-label">Tiempo preparación (min)</label>
+              <input type="number" class="form-control" id="tiempo-preparacion" required min="0">
+            </div>
+            <div class="col-md-3 mb-3">
+              <label for="tiempo-coccion" class="form-label">Tiempo cocción (min)</label>
+              <input type="number" class="form-control" id="tiempo-coccion" required min="0">
+            </div>
+            <div class="col-md-2 mb-3">
+              <label for="porciones" class="form-label">Porciones</label>
+              <input type="number" class="form-control" id="porciones" required min="1">
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="tipo" class="form-label">Tipo de comida</label>
+              <select class="form-select" id="tipo" required>
+                <option value="">Seleccionar</option>
+                <option value="desayuno">Desayuno</option>
+                <option value="almuerzo">Almuerzo</option>
+                <option value="cena">Cena</option>
+                <option value="postre">Postre</option>
+                <option value="botana">Botana</option>
+              </select>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="dificultad" class="form-label">Dificultad</label>
+              <select class="form-select" id="dificultad" required>
+                <option value="">Seleccionar</option>
+                <option value="facil">Fácil</option>
+                <option value="media">Media</option>
+                <option value="dificil">Difícil</option>
+              </select>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="ocasion" class="form-label">Ocasión</label>
+              <select class="form-select" id="ocasion" required>
+                <option value="">Seleccionar</option>
+                <option value="diario">Diario</option>
+                <option value="especial">Especial</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-lg w-100" id="btn-crear">
+        Publicar Receta
+      </button>
+    </form>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../js/config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/crear_receta.js"></script>
+</body>
+</html>
