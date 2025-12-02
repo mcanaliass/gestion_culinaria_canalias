@@ -1,0 +1,30 @@
+{
+  "name": "gestion-culinaria-canalias",
+  "version": "1.0.0",
+  "description": "Sistema de gestión culinaria para compartir y descubrir recetas",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js"
+  },
+  "keywords": [
+    "recetas",
+    "culinaria",
+    "nodejs",
+    "mongodb",
+    "express"
+  ],
+  "author": "MJ Canalias",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^8.0.3",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
