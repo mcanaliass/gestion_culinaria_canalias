@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('token', data.token);
         localStorage.setItem('usuario', JSON.stringify(data.usuario));
         
-        mostrarMensaje('¡Inicio de sesión exitoso! Redirigiendo...', 'success');
+        mostrarMensaje('Bienvenido!  Redirigiendo...', 'success');
         setTimeout(() => {
           window.location.href = 'index.html';
         }, 1500);

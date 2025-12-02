@@ -1,3 +1,4 @@
+//backend\server.js
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -23,11 +24,13 @@ mongoose.connect(process.env.MONGODB_URI)
 const authRoutes = require('./routes/auth_routes');
 const recipeRoutes = require('./routes/recipe_routes');
 const userRoutes = require('./routes/user_routes');
+const adminRoutes = require('./routes/admin_routes');
 
 // Usar rutas
 app.use('/api/auth', authRoutes);
 app.use('/api/recipes', recipeRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Ruta raíz - redirige al frontend
 app.get('/', (req, res) => {

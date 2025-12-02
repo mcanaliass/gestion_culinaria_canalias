@@ -25,6 +25,9 @@
           <li class="nav-item" id="nav-crear" style="display: none;">
             <a class="nav-link" href="crear_receta.html">Crear Receta</a>
           </li>
+          <li class="nav-item" id="nav-admin" style="display: none;">
+            <a class="nav-link" href="admin.html">Administración</a>
+          </li>
           <li class="nav-item">
             <a class="nav-link" href="#" id="btn-logout">Cerrar Sesión</a>
           </li>
@@ -42,8 +45,9 @@
 
     <div id="perfil-container" style="display: none;">
       <div class="row">
+        <!-- Columna izquierda: Información del usuario -->
         <div class="col-md-4">
-          <div class="card">
+          <div class="card mb-3">
             <div class="card-body text-center">
               <h3 id="perfil-nombre" class="mb-3"></h3>
               <p class="text-muted" id="perfil-email"></p>
@@ -51,15 +55,26 @@
               <hr>
               <div class="mb-3">
                 <strong>Biografía</strong>
-                <p id="perfil-biografia" class="mt-2">Sin biografía</p>
+                <p id="perfil-biografia" class="mt-2 text-muted">Sin biografía</p>
               </div>
-              <button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#modalEditarPerfil">
-                ✏️ Editar Perfil
+              <div class="mb-3">
+                <strong>Preferencias Dietéticas</strong>
+                <div id="perfil-preferencias" class="mt-2"></div>
+              </div>
+              <button class="btn btn-outline-primary w-100 mb-2" data-bs-toggle="modal" data-bs-target="#modalEditarPerfil">
+                Editar Perfil
+              </button>
+              <button class="btn btn-outline-warning w-100 mb-2" data-bs-toggle="modal" data-bs-target="#modalCambiarPassword">
+                Cambiar Contraseña
+              </button>
+              <button class="btn btn-outline-info w-100" data-bs-toggle="modal" data-bs-target="#modalCambiarEmail">
+                Cambiar Email
               </button>
             </div>
           </div>
         </div>
 
+        <!-- Columna derecha: Tabs de recetas -->
         <div class="col-md-8">
           <ul class="nav nav-tabs mb-3" id="perfil-tabs" role="tablist">
             <li class="nav-item" role="presentation">
@@ -96,7 +111,7 @@
     </div>
   </main>
 
-  <!-- Modal Editar Perfil -->
+  <!-- Modal: Editar Perfil -->
   <div class="modal fade" id="modalEditarPerfil" tabindex="-1">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -105,16 +120,101 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
+          <div id="mensaje-editar-perfil"></div>
           <form id="form-editar-perfil">
             <div class="mb-3">
-              <label for="editar-nombre" class="form-label">Nombre</label>
-              <input type="text" class="form-control" id="editar-nombre" required>
+              <label for="editar-nombre" class="form-label">Nombre completo</label>
+              <input type="text" class="form-control" id="editar-nombre" required maxlength="100">
             </div>
             <div class="mb-3">
               <label for="editar-biografia" class="form-label">Biografía</label>
               <textarea class="form-control" id="editar-biografia" rows="3" maxlength="500"></textarea>
+              <small class="form-text text-muted">Máximo 500 caracteres</small>
             </div>
-            <button type="submit" class="btn btn-primary w-100">Guardar Cambios</button>
+            <div class="mb-3">
+              <label class="form-label">Preferencias Dietéticas</label>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="vegetariano" id="pref-vegetariano">
+                <label class="form-check-label" for="pref-vegetariano">Vegetariano</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="vegano" id="pref-vegano">
+                <label class="form-check-label" for="pref-vegano">Vegano</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="sin-gluten" id="pref-sin-gluten">
+                <label class="form-check-label" for="pref-sin-gluten">Sin Gluten</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="sin-lactosa" id="pref-sin-lactosa">
+                <label class="form-check-label" for="pref-sin-lactosa">Sin Lactosa</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="ninguna" id="pref-ninguna">
+                <label class="form-check-label" for="pref-ninguna">Ninguna</label>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">💾 Guardar Cambios</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Cambiar Contraseña -->
+  <div class="modal fade" id="modalCambiarPassword" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Cambiar Contraseña</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div id="mensaje-cambiar-password"></div>
+          <form id="form-cambiar-password">
+            <div class="mb-3">
+              <label for="password-actual" class="form-label">Contraseña Actual</label>
+              <input type="password" class="form-control" id="password-actual" required>
+            </div>
+            <div class="mb-3">
+              <label for="password-nueva" class="form-label">Nueva Contraseña</label>
+              <input type="password" class="form-control" id="password-nueva" required minlength="8">
+              <small class="form-text text-muted">
+                Mínimo 8 caracteres, debe incluir mayúscula, minúscula y número
+              </small>
+            </div>
+            <div class="mb-3">
+              <label for="password-confirmar" class="form-label">Confirmar Nueva Contraseña</label>
+              <input type="password" class="form-control" id="password-confirmar" required>
+            </div>
+            <button type="submit" class="btn btn-warning w-100">Cambiar Contraseña</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Cambiar Email -->
+  <div class="modal fade" id="modalCambiarEmail" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Cambiar Correo Electrónico</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div id="mensaje-cambiar-email"></div>
+          <form id="form-cambiar-email">
+            <div class="mb-3">
+              <label for="email-nuevo" class="form-label">Nuevo Correo Electrónico</label>
+              <input type="email" class="form-control" id="email-nuevo" required>
+            </div>
+            <div class="mb-3">
+              <label for="email-password" class="form-label">Confirma tu Contraseña</label>
+              <input type="password" class="form-control" id="email-password" required>
+              <small class="form-text text-muted">Por seguridad, necesitamos verificar tu identidad</small>
+            </div>
+            <button type="submit" class="btn btn-info w-100">Cambiar Email</button>
           </form>
         </div>
       </div>
