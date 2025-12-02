@@ -1,3 +1,4 @@
+//backend\models\recipe.js
 const mongoose = require('mongoose');
 
 const ingredienteSchema = new mongoose.Schema({

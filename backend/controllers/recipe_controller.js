@@ -1,3 +1,4 @@
+//backend\controllers\recipe_controller
 const Recipe = require('../models/recipe');
 const User = require('../models/user');
 
@@ -73,7 +74,14 @@ exports.obtenerRecetaPorId = async (req, res) => {
     const receta = await Recipe.findById(req.params.id)
       .populate('autor', 'nombre fotoPerfil biografia')
       .populate('comentarios.usuario', 'nombre fotoPerfil')
-      .populate('recetaOriginal', 'titulo autor');
+      .populate({
+        path: 'recetaOriginal',
+        select: 'titulo autor',
+        populate: { 
+          path: 'autor', 
+          select: 'nombre fotoPerfil' 
+        }
+      });
 
     if (!receta) {
       return res.status(404).json({
@@ -132,7 +140,8 @@ exports.crearReceta = async (req, res) => {
       tipo,
       dificultad,
       ocasion,
-      estado: estado || 'publicada'
+      estado: estado || 'publicada',
+      recetaOriginal: req.body.recetaOriginal || null  
     });
 
     await nuevaReceta.save();

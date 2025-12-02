@@ -1,3 +1,6 @@
+// frontend/js/ver_receta.js
+let recetaActual = null; // Variable global para almacenar la receta
+
 document.addEventListener('DOMContentLoaded', async () => {
   const params = new URLSearchParams(window.location.search);
   const recetaId = params.get('id');
@@ -16,6 +19,7 @@ async function cargarReceta(id) {
     const data = await response.json();
 
     if (data.success) {
+      recetaActual = data.receta; // Guardar receta globalmente
       mostrarReceta(data.receta);
     } else {
       document.getElementById('receta-loading').innerHTML = '<p class="text-danger">Receta no encontrada</p>';
@@ -51,28 +55,43 @@ function mostrarReceta(receta) {
   document.getElementById('receta-costo-total').textContent = '₡' + costoTotal.toFixed(2);
   document.getElementById('receta-costo').textContent = '₡' + receta.costoPorPorcion.toFixed(2);
 
+  // ARREGLO: Mostrar información de receta original
   if (receta.recetaOriginal) {
     const infoOriginal = document.getElementById('receta-original-info');
     const linkOriginal = document.getElementById('receta-original-link');
+    const linkAutorOriginal = document.getElementById('receta-autor-original-link');
+    
     infoOriginal.style.display = 'block';
+    
+    // Link a la receta original
     linkOriginal.href = `ver_receta.html?id=${receta.recetaOriginal._id}`;
-    linkOriginal.textContent = receta.recetaOriginal.titulo;
+    linkOriginal.textContent = `"${receta.recetaOriginal.titulo}"`;
+    
+    // CRÍTICO: Link al perfil del autor ORIGINAL (no del usuario en sesión)
+    if (receta.recetaOriginal.autor) {
+      linkAutorOriginal.href = `perfil_publico.html?id=${receta.recetaOriginal.autor._id}`;
+      linkAutorOriginal.textContent = receta.recetaOriginal.autor.nombre;
+    }
   }
 
+  // Mostrar ingredientes
   const ingredientesLista = document.getElementById('ingredientes-lista');
   ingredientesLista.innerHTML = '';
   receta.ingredientes.forEach(ing => {
     ingredientesLista.innerHTML += `<li>${ing.cantidad} ${ing.unidad} de ${ing.nombre} (₡${ing.costoEstimado.toFixed(2)})</li>`;
   });
 
+  // Mostrar pasos
   const pasosLista = document.getElementById('pasos-lista');
   pasosLista.innerHTML = '';
   receta.pasos.forEach(paso => {
     pasosLista.innerHTML += `<li>${paso.descripcion}</li>`;
   });
 
+  // Mostrar calificación
   document.getElementById('calificacion-promedio').textContent = receta.calificacionPromedio.toFixed(1);
 
+  // Mostrar comentarios
   const comentariosLista = document.getElementById('comentarios-lista');
   comentariosLista.innerHTML = '';
   if (receta.comentarios.length === 0) {
@@ -89,19 +108,59 @@ function mostrarReceta(receta) {
     });
   }
 
+  // Verificar autenticación y mostrar controles correspondientes
   const auth = verificarAutenticacion();
   if (auth) {
     document.getElementById('acciones-card').style.display = 'block';
     document.getElementById('calificar-container').style.display = 'block';
     document.getElementById('form-comentario').style.display = 'block';
 
+    // Verificar si el usuario actual es el autor de la receta
     if (auth.usuario.id === receta.autor._id) {
       document.getElementById('acciones-autor').style.display = 'block';
     }
+
+    // NUEVO: Verificar si ya está en favoritos
+    verificarEstadoFavorito(receta._id);
   }
 
   // IMPORTANTE: Configurar acciones AL FINAL
   configurarAcciones(receta._id);
+}
+
+// NUEVO: Verificar si la receta está en favoritos
+async function verificarEstadoFavorito(recetaId) {
+  try {
+    const response = await fetch(`${API_URL}/users/perfil`, {
+      headers: {
+        'Authorization': `Bearer ${obtenerToken()}`
+      }
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      const usuario = data.usuario;
+      const estaEnFavoritos = usuario.recetasFavoritas.some(fav => 
+        (fav._id || fav) === recetaId
+      );
+
+      const btnFavorito = document.getElementById('btn-favorito');
+      if (estaEnFavoritos) {
+        btnFavorito.textContent = '❤️ Quitar de Favoritos';
+        btnFavorito.classList.remove('btn-success');
+        btnFavorito.classList.add('btn-danger');
+        btnFavorito.dataset.enFavoritos = 'true';
+      } else {
+        btnFavorito.textContent = '💚 Agregar a Favoritos';
+        btnFavorito.classList.remove('btn-danger');
+        btnFavorito.classList.add('btn-success');
+        btnFavorito.dataset.enFavoritos = 'false';
+      }
+    }
+  } catch (error) {
+    console.error('Error al verificar favoritos:', error);
+  }
 }
 
 function configurarAcciones(recetaId) {
@@ -123,7 +182,6 @@ function configurarAcciones(recetaId) {
     // Click para calificar
     btn.addEventListener('click', () => {
       const estrellas = parseInt(btn.dataset.estrellas);
-      console.log('Calificando con:', estrellas, 'estrellas');
       calificarReceta(recetaId, estrellas);
     });
   });
@@ -145,15 +203,22 @@ function configurarAcciones(recetaId) {
     });
   }
 
-  // Configurar botones de acciones (favoritos, editar, eliminar, etc.)
+  // Configurar botones de acciones
   const btnFavorito = document.getElementById('btn-favorito');
   const btnVersionDerivada = document.getElementById('btn-version-derivada');
   const btnEditar = document.getElementById('btn-editar');
   const btnEliminar = document.getElementById('btn-eliminar');
 
+  // MEJORADO: Toggle favoritos
   if (btnFavorito) {
-    btnFavorito.addEventListener('click', () => {
-      agregarAFavoritos(recetaId);
+    btnFavorito.addEventListener('click', async () => {
+      const estaEnFavoritos = btnFavorito.dataset.enFavoritos === 'true';
+      
+      if (estaEnFavoritos) {
+        await quitarDeFavoritos(recetaId);
+      } else {
+        await agregarAFavoritos(recetaId);
+      }
     });
   }
 
@@ -193,7 +258,19 @@ async function calificarReceta(id, estrellas) {
 
     if (data.success) {
       document.getElementById('calificacion-promedio').textContent = data.calificacionPromedio.toFixed(1);
-      alert('¡Calificación registrada!');
+      
+      // Mostrar mensaje de éxito más amigable
+      const mensaje = document.createElement('div');
+      mensaje.className = 'alert alert-success alert-dismissible fade show mt-3';
+      mensaje.innerHTML = `
+        ✅ ¡Calificación registrada! (${estrellas} estrellas)
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      `;
+      document.getElementById('calificar-container').appendChild(mensaje);
+      
+      setTimeout(() => {
+        mensaje.remove();
+      }, 3000);
     } else {
       alert(data.message);
     }
@@ -224,7 +301,9 @@ async function comentarReceta(id) {
     const data = await response.json();
 
     if (data.success) {
-      location.reload();
+      // Recargar solo los comentarios en vez de toda la página
+      document.getElementById('comentario-texto').value = '';
+      location.reload(); // Temporal - se puede mejorar con actualización dinámica
     } else {
       alert(data.message);
     }
@@ -234,6 +313,7 @@ async function comentarReceta(id) {
   }
 }
 
+// MEJORADO: Agregar a favoritos con feedback visual
 async function agregarAFavoritos(id) {
   try {
     const response = await fetch(`${API_URL}/users/favoritos/${id}`, {
@@ -246,13 +326,50 @@ async function agregarAFavoritos(id) {
     const data = await response.json();
 
     if (data.success) {
-      alert('¡Receta agregada a favoritos!');
+      const btnFavorito = document.getElementById('btn-favorito');
+      btnFavorito.textContent = '❤️ Quitar de Favoritos';
+      btnFavorito.classList.remove('btn-success');
+      btnFavorito.classList.add('btn-danger');
+      btnFavorito.dataset.enFavoritos = 'true';
+      
+      // Mensaje de éxito
+      alert('✅ Receta agregada a favoritos');
     } else {
       alert(data.message);
     }
   } catch (error) {
     console.error('Error:', error);
     alert('Error al agregar a favoritos');
+  }
+}
+
+// NUEVO: Quitar de favoritos
+async function quitarDeFavoritos(id) {
+  try {
+    const response = await fetch(`${API_URL}/users/favoritos/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${obtenerToken()}`
+      }
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      const btnFavorito = document.getElementById('btn-favorito');
+      btnFavorito.textContent = '💚 Agregar a Favoritos';
+      btnFavorito.classList.remove('btn-danger');
+      btnFavorito.classList.add('btn-success');
+      btnFavorito.dataset.enFavoritos = 'false';
+      
+      // Mensaje de éxito
+      alert('✅ Receta quitada de favoritos');
+    } else {
+      alert(data.message);
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Error al quitar de favoritos');
   }
 }
 
@@ -272,7 +389,7 @@ async function eliminarReceta(id) {
     const data = await response.json();
 
     if (data.success) {
-      alert('Receta eliminada exitosamente');
+      alert('✅ Receta eliminada exitosamente');
       window.location.href = 'perfil.html';
     } else {
       alert(data.message);
