@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perfil de Usuario - Cocinalias</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">🍳 Cocinalias</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="explorar.html">Explorar Recetas</a>
+          </li>
+          <li class="nav-item" id="nav-perfil-logueado" style="display: none;">
+            <a class="nav-link" href="perfil.html">Mi Perfil</a>
+          </li>
+          <li class="nav-item" id="nav-crear" style="display: none;">
+            <a class="nav-link" href="crear_receta.html">Crear Receta</a>
+          </li>
+          <li class="nav-item" id="nav-admin" style="display: none;">
+            <a class="nav-link" href="admin.html">Administración</a>
+          </li>
+          <li class="nav-item" id="nav-login" style="display: none;">
+            <a class="nav-link" href="login.html">Iniciar Sesión</a>
+          </li>
+          <li class="nav-item" id="nav-logout" style="display: none;">
+            <a class="nav-link" href="#" id="btn-logout">Cerrar Sesión</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container my-5">
+    <!-- Estado de carga -->
+    <div id="perfil-loading" class="text-center">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando perfil...</span>
+      </div>
+      <p class="mt-3 text-muted">Cargando información del usuario...</p>
+    </div>
+
+    <!-- Mensaje de error -->
+    <div id="perfil-error" style="display: none;" class="alert alert-danger text-center">
+      <h4>❌ Usuario no encontrado</h4>
+      <p>El perfil que buscas no existe o no está disponible.</p>
+      <a href="explorar.html" class="btn btn-primary">Explorar Recetas</a>
+    </div>
+
+    <!-- Contenedor del perfil -->
+    <div id="perfil-container" style="display: none;">
+      <div class="row">
+        <!-- Columna izquierda: Información del usuario -->
+        <div class="col-md-4 mb-4">
+          <div class="card shadow-sm">
+            <div class="card-body text-center">
+              <div class="mb-3">
+                <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center" 
+                     style="width: 100px; height: 100px; font-size: 2.5rem;">
+                  <span id="perfil-inicial">U</span>
+                </div>
+              </div>
+              
+              <h3 id="perfil-nombre" class="mb-2"></h3>
+              <p class="text-muted small mb-2" id="perfil-email"></p>
+              <span class="badge bg-primary mb-3" id="perfil-rol"></span>
+              
+              <hr>
+              
+              <div class="mb-3 text-start">
+                <h6 class="text-muted mb-2"><strong>📖 Biografía</strong></h6>
+                <p id="perfil-biografia" class="small">Sin biografía</p>
+              </div>
+              
+              <div class="mb-3 text-start">
+                <h6 class="text-muted mb-2"><strong>🥗 Preferencias Dietéticas</strong></h6>
+                <div id="perfil-preferencias"></div>
+              </div>
+              
+              <hr>
+              
+              <div class="row text-center">
+                <div class="col-6">
+                  <h5 id="perfil-total-recetas" class="mb-0">0</h5>
+                  <small class="text-muted">Recetas</small>
+                </div>
+                <div class="col-6">
+                  <h5 id="perfil-total-vistas" class="mb-0">0</h5>
+                  <small class="text-muted">Vistas</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Columna derecha: Recetas del usuario -->
+        <div class="col-md-8">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4>Recetas de <span id="nombre-recetas"></span></h4>
+            <span class="badge bg-secondary" id="contador-recetas">0 recetas</span>
+          </div>
+          
+          <div id="recetas-container" class="row">
+            <!-- Las recetas se cargarán aquí -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="bg-dark text-white text-center py-3 mt-5">
+    <div class="container">
+      <p class="mb-0">&copy; 2024 Cocinalias - Plataforma de Recetas</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../js/config.js"></script>
+  <script src="../js/perfil_publico.js"></script>
+</body>
+</html>

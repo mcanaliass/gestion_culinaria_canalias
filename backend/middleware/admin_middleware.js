@@ -1,4 +1,4 @@
-//backend\middleware\auth_middleware.js
+// backend/middleware/admin_middleware.js
 const jwt = require('jsonwebtoken');
 
 module.exports = (req, res, next) => {
@@ -15,6 +15,15 @@ module.exports = (req, res, next) => {
 
     // Verificar token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    
+    // Verificar que el usuario sea administrador
+    if (decoded.rol !== 'administrador') {
+      return res.status(403).json({
+        success: false,
+        message: 'Acceso denegado. Solo los administradores pueden realizar esta acción'
+      });
+    }
+
     req.usuario = decoded;
     next();
 

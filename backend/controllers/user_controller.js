@@ -1,3 +1,4 @@
+// backend/controllers/user_controller.js
 const User = require('../models/user');
 const Recipe = require('../models/recipe');
 
@@ -15,7 +16,6 @@ exports.obtenerPerfil = async (req, res) => {
       });
     }
 
-    // Obtener recetas creadas por el usuario
     const recetasCreadas = await Recipe.find({ autor: req.usuario.id })
       .select('titulo imagenPrincipal calificacionPromedio vistas');
 
@@ -33,7 +33,7 @@ exports.obtenerPerfil = async (req, res) => {
   }
 };
 
-// Actualizar perfil
+// Actualizar perfil (ACTUALIZADO según RF-003)
 exports.actualizarPerfil = async (req, res) => {
   try {
     const { nombre, biografia, preferenciasDieteticas } = req.body;
@@ -47,7 +47,7 @@ exports.actualizarPerfil = async (req, res) => {
       });
     }
 
-    // Actualizar campos permitidos
+    // Actualizar campos permitidos según RF-003
     if (nombre) usuario.nombre = nombre;
     if (biografia !== undefined) usuario.biografia = biografia;
     if (preferenciasDieteticas) usuario.preferenciasDieteticas = preferenciasDieteticas;
@@ -62,7 +62,8 @@ exports.actualizarPerfil = async (req, res) => {
         nombre: usuario.nombre,
         email: usuario.email,
         biografia: usuario.biografia,
-        preferenciasDieteticas: usuario.preferenciasDieteticas
+        preferenciasDieteticas: usuario.preferenciasDieteticas,
+        fotoPerfil: usuario.fotoPerfil
       }
     });
   } catch (error) {
@@ -70,6 +71,140 @@ exports.actualizarPerfil = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error al actualizar perfil'
+    });
+  }
+};
+
+// NUEVO: Cambiar contraseña (buena práctica de seguridad)
+exports.cambiarPassword = async (req, res) => {
+  try {
+    const { passwordActual, passwordNueva } = req.body;
+
+    // Validar datos
+    if (!passwordActual || !passwordNueva) {
+      return res.status(400).json({
+        success: false,
+        message: 'Debes proporcionar la contraseña actual y la nueva'
+      });
+    }
+
+    // Validar longitud de contraseña nueva
+    if (passwordNueva.length < 8) {
+      return res.status(400).json({
+        success: false,
+        message: 'La contraseña nueva debe tener mínimo 8 caracteres'
+      });
+    }
+
+    // Validar formato de contraseña nueva
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+    if (!passwordRegex.test(passwordNueva)) {
+      return res.status(400).json({
+        success: false,
+        message: 'La contraseña debe contener al menos una mayúscula, una minúscula y un número'
+      });
+    }
+
+    const usuario = await User.findById(req.usuario.id);
+
+    if (!usuario) {
+      return res.status(404).json({
+        success: false,
+        message: 'Usuario no encontrado'
+      });
+    }
+
+    // Verificar contraseña actual
+    const passwordCorrecta = await usuario.compararPassword(passwordActual);
+    if (!passwordCorrecta) {
+      return res.status(401).json({
+        success: false,
+        message: 'La contraseña actual es incorrecta'
+      });
+    }
+
+    // Actualizar contraseña
+    usuario.password = passwordNueva;
+    await usuario.save();
+
+    res.json({
+      success: true,
+      message: 'Contraseña actualizada exitosamente'
+    });
+
+  } catch (error) {
+    console.error('Error al cambiar contraseña:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al cambiar contraseña'
+    });
+  }
+};
+
+// NUEVO: Cambiar email (buena práctica de usabilidad)
+exports.cambiarEmail = async (req, res) => {
+  try {
+    const { nuevoEmail, password } = req.body;
+
+    // Validar datos
+    if (!nuevoEmail || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Debes proporcionar el nuevo email y tu contraseña'
+      });
+    }
+
+    // Validar formato de email
+    const emailRegex = /^\S+@\S+\.\S+$/;
+    if (!emailRegex.test(nuevoEmail)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Por favor ingresa un correo electrónico válido'
+      });
+    }
+
+    const usuario = await User.findById(req.usuario.id);
+
+    if (!usuario) {
+      return res.status(404).json({
+        success: false,
+        message: 'Usuario no encontrado'
+      });
+    }
+
+    // Verificar contraseña
+    const passwordCorrecta = await usuario.compararPassword(password);
+    if (!passwordCorrecta) {
+      return res.status(401).json({
+        success: false,
+        message: 'Contraseña incorrecta'
+      });
+    }
+
+    // Verificar que el nuevo email no esté en uso
+    const emailExistente = await User.findOne({ email: nuevoEmail });
+    if (emailExistente) {
+      return res.status(400).json({
+        success: false,
+        message: 'El correo electrónico ya está en uso'
+      });
+    }
+
+    // Actualizar email
+    usuario.email = nuevoEmail;
+    await usuario.save();
+
+    res.json({
+      success: true,
+      message: 'Correo electrónico actualizado exitosamente',
+      nuevoEmail: usuario.email
+    });
+
+  } catch (error) {
+    console.error('Error al cambiar email:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al cambiar correo electrónico'
     });
   }
 };
@@ -87,7 +222,6 @@ exports.agregarFavorito = async (req, res) => {
       });
     }
 
-    // Verificar si ya está en favoritos
     if (usuario.recetasFavoritas.includes(req.params.recetaId)) {
       return res.status(400).json({
         success: false,
@@ -169,6 +303,62 @@ exports.obtenerFavoritos = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error al obtener favoritos'
+    });
+  }
+};
+
+//Obtener perfil público de un usuario
+exports.obtenerPerfilPublico = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Buscar usuario sin información sensible
+    const usuario = await User.findById(id)
+      .select('nombre email rol biografia fotoPerfil preferenciasDieteticas fechaRegistro');
+
+    if (!usuario) {
+      return res.status(404).json({
+        success: false,
+        message: 'Usuario no encontrado'
+      });
+    }
+
+    // Buscar recetas publicadas del usuario
+    const recetas = await Recipe.find({ 
+      autor: id,
+      estado: 'publicada' 
+    })
+      .select('titulo descripcion imagenPrincipal calificacionPromedio vistas tiempoPreparacion tiempoCoccion porciones dificultad tipo fechaCreacion')
+      .sort({ fechaCreacion: -1 });
+
+    // Calcular estadísticas
+    const totalVistas = recetas.reduce((sum, receta) => sum + (receta.vistas || 0), 0);
+    const totalRecetas = recetas.length;
+
+    res.json({
+      success: true,
+      usuario: {
+        _id: usuario._id,
+        nombre: usuario.nombre,
+        email: usuario.email,
+        rol: usuario.rol,
+        biografia: usuario.biografia,
+        fotoPerfil: usuario.fotoPerfil,
+        preferenciasDieteticas: usuario.preferenciasDieteticas,
+        fechaRegistro: usuario.fechaRegistro,
+        estadisticas: {
+          totalRecetas,
+          totalVistas
+        }
+      },
+      recetas
+    });
+
+  } catch (error) {
+    console.error('Error al obtener perfil público:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener perfil público'
     });
   }
 };
